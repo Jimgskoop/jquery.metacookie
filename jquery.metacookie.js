@@ -1,180 +1,220 @@
-jQuery.extend(true, (function(){
+jQuery.extend(true, ( function () {
     
-   var gCookieLife = '1 year', // cookies will expire in 1 year by default
-     gMajorDelim = '|', // delimiter for sub-cookies in meta cookies
-     gMinorDelim = '=', // delimiter between key-value pairs for sub-cookies w/in meta cookies
-     gDomain = window.location.hostname;
+  var gCookieLife = '1 year', // cookies will expire in 1 year by default
+  gMajorDelim = '|', // delimiter for sub-cookies in meta cookies
+  gMinorDelim = '=', // delimiter between key-value pairs for sub-cookies w/in meta cookies
+  gDomain = window.location.hostname;
 
-    /**
-     * set a cookie	
-     */
-    _setCookie = function (name, value, expires, path, domain, secure) {
+  /**
+   * Sorts through a given array, splitting up each
+   * element by a given delimiter into key/value pairs,
+   * then find the value that corresponds to a given key.
+   * (used to parse cookies)
+   * @method splitFind
+   * @private
+   * @param {Array} list The array to parse
+   * @param {String} key The key to look for
+   * @param {String} delim The delimiter to use for key/value pair splitting
+   */
+  function splitFind(list, key, delim) {
+    var i,
+    result, 
+    fields, 
+    tmp, 
+    len = list.length;
 
-  	  var cookieUnits = 24 * 60 * 60 * 1000, // default to day units
-  	    permCookie = true,
-  	    expDate = new Date(),
-  	    cookieStr;
+    for (i=0; i < len; i++) {
+      tmp = list[i];
+      if (tmp) {  
+        fields = tmp.split(delim);
+        if (fields[0] === key) {
+          result = fields[1];
+          break;    
+        } 
+      }
+    }
+    return(result);
+  }
 
-      if (!name || !value) {
-		    if (console) {
-		      console.log("ERROR: missing name or value for [" + name + "] -- cookie not set!");
-		    }
-		    return this;
-	    }
+  /**
+   * Sets a cookie
+   * @method setCookie
+   * @private
+   * @param {String} name The name of the cookie
+   * @param {String} value The value of the cookie
+   * @param {String} expires The duration of the cookie; accepts strings like "2 years", "2 months"; defaults to "1 year"
+   * @param {String} path The path for the cookie; defaults to "/"
+   * @param {String} domain The domain for the cookie; defaults to the current domain
+   * @param {Boolean} secure Toggles the security setting for the cookie
+   * @return {Void}
+   */
+  function setCookie(name, value, expires, path, domain, secure) {
+    var cookieUnits = 24 * 60 * 60 * 1000, // default to day units
+    permCookie = true,
+    expDate = new Date(),
+    cookieStr;
+
+    if (!name || !value) {
+      if (console) {
+        console.log("ERROR: missing name or value for [" + name + "] -- cookie not set!");
+      }
+      return;
+    }
 	
-		  expires = expires || gCookieLife;
-	
-	    if (expires.match(/year/)) {
-		    expires	= parseInt(expires, 10) * 365 * cookieUnits;	    
-	    }
-	    else if (expires.match(/month/)) {
-		    expires = parseInt(expires, 10) * 30 * cookieUnits;	    
-	    }
-	    else if (expires.match(/kill|remove|delete/)) {
-		    expires = -1 * 365 * cookieUnits;	    
-	    }
-	    else {
-	      permCookie = false;
-				expires = parseInt(expires, 10);
-	    }
+    expires = expires || gCookieLife;
+
+    if (expires.match(/year/)) {
+      expires	= parseInt(expires, 10) * 365 * cookieUnits;	    
+    }
+    else if (expires.match(/month/)) {
+      expires = parseInt(expires, 10) * 30 * cookieUnits;	    
+    }
+    else if (expires.match(/kill|remove|delete/)) {
+      expires = -1 * 365 * cookieUnits;	    
+    }
+    else {
+      permCookie = false;
+      expires = parseInt(expires, 10);
+    }
 				
-	    if (permCookie) {
-	      expDate.setTime(expDate.getTime() + expires);  
-	    }
+    if (permCookie) {
+      expDate.setTime(expDate.getTime() + expires);  
+    }
 		
-	    cookieStr = name + "=" + encodeURIComponent(value) 
-		    + ((permCookie) ? "; expires=" + expDate.toGMTString() : "") 
-		    + "; path=" + ((path) ? path : "/")
-		    + "; domain=" + ((domain) ? domain : gDomain)
-		    + ((secure) ? "; secure" : "");
+    cookieStr = name + "=" + encodeURIComponent(value) 
+    + ((permCookie) ? "; expires=" + expDate.toGMTString() : "") 
+    + "; path=" + ((path) ? path : "/")
+    + "; domain=" + ((domain) ? domain : gDomain)
+    + ((secure) ? "; secure" : "");
 	
-	    document.cookie = cookieStr;
-	
-    };
+    document.cookie = cookieStr;
+  }
 
-    /**
-     * retrieve a cookie by name
-     */
-    _getCookie = function (name) {
-	    var cookieStr = document.cookie,
-	      cookies = [],
-	      result;
-	
-	    if (cookieStr) {
-	      cookies = cookieStr.split(/;\s*/);
-	    }
-	
-	    result = splitFind(cookies, name, '=');
-	
-	    return(unescape(result));
-    };
+  /**
+   * Retrieves a cookie by name
+   * @method getCookie
+   * @private
+   * @param {String} name The name of the cookie
+   * @return {String} The value of the cookie
+   */  
+  function getCookie(name) {
+    var cookieStr = document.cookie,
+    cookies = [],
+    result;
 
-    /**
-     * delete a cookie by name
-     */
-    _deleteCookie = function (name) {
-      return _setCookie(name, -1, 'kill');
-    };
-
-    /**
-     * sort through a given array, splitting up each
-     * element by a given delimiter into key/value pairs,
-     * then find the value that corresponds to a given key.
-     * (used to parse cookies)
-     * @private
-     */
-    function splitFind(list, key, delim) {
-	    var result, 
-		    fields, 
-		    tmp, 
-		    len = list.length;
-	
-	    for (var i=0; i < len; i++) {
-		    tmp = list[i];
-		    if (tmp) {	
-			    fields = tmp.split(delim);
-			    if (fields[0] == key) {
-				    result = fields[1];
-				    break;		
-			    }	
-		    }
-	    }
-	
-	    return(result);
+    if (cookieStr) {
+      cookies = cookieStr.split(/;\s*/);
     }
 
-    /**
-     * retrieve the value for a subcookie in a meta cookie.
-     */
-    _getMetaCookie = function (subName, name) {
-	    var cookieStr = _getCookie(name);
-	    return(splitFind(cookieStr.split(gMajorDelim), subName, gMinorDelim));
-    };
+    result = splitFind(cookies, name, '=');
 
-    /**
-     * set a sub cookie within a meta cookie.
-     */
-    _setMetaCookie = function (subName, name, value) {
-	    var currentCookieVal = _getCookie(name),
-	      subCookies = [],
-	      temp = [],
-	      newCookieVal = '',
-	      fields,
-	      i;
-	
-	    if (currentCookieVal) {
-	      subCookies = currentCookieVal.split(gMajorDelim);
-	    }
-		  
-	    // get all existing sub cookies
-	    for (i in subCookies) {
-		    fields = subCookies[i].split(gMinorDelim);
-		    if (fields[0] && fields[1]) {
-		      temp[fields[0]] = fields[1]; // build hash  
-		    }	
-	    }
-		
-	    // set or reset sub cookie
-	    if (subName) {
-	      temp[subName] = value;
-	    }
-		  
-	    // rebuild cookie string
-	    for (i in temp) {
-		    // don't rebuild null values
-		    if (temp[i]) {
-		      newCookieVal += gMajorDelim + i + gMinorDelim + temp[i];   
-		    }
-	    }
-	
-	    return(_setCookie(name, newCookieVal));
-    };
+    return(decodeURIComponent(result));
+  }
 
-    /**
-     * removes a sub cookie within a meta cookie
-     */
-    _deleteMetaCookie = function (subName, name) {
-	    // set value to null so it's subcookie doesn't get re-added
-	    return(_setMetaCookie(subName, name, null));
-    };
+  /**
+   * Deletes a cookie by name
+   * @method setCookie
+   * @private
+   * @param {String} name The name of the cookie
+   * @return {Void}
+   */
+  function deleteCookie(name) {
+    return setCookie(name, -1, 'kill');
+  }
 
-		/**
-		 * reports cookie domain
-		 */
-		_getDomain = function() {
-			return gDomain;
-		};
+  /**
+   * Retrieves the value for a subcookie in a meta cookie.
+   * @method getMetaCookie
+   * @private
+   * @param {String} subName The name of the cookie subfield
+   * @param {String} name The name of the cookie
+   * @return {String} The value of the cookie subfield
+   */  
+  function getMetaCookie(subName, name) {
+    var cookieStr = getCookie(name);
+    return splitFind(cookieStr.split(gMajorDelim), subName, gMinorDelim);
+  }
 
+  /**
+   * Sets a sub cookie within a meta cookie.
+   * @method setMetaCookie
+   * @private
+   * @param {String} subName The name of the cookie subfield
+   * @param {String} name The name of the cookie
+   * @param {String} value The value to set
+   * @return {Void}
+   */  
+  function setMetaCookie(subName, name, value) {
+    var currentCookieVal = getCookie(name),
+    subCookies = [],
+    temp = [],
+    newCookieVal = '',
+    fields,
+    x;
 
+    if (currentCookieVal) {
+      subCookies = currentCookieVal.split(gMajorDelim);
+    }
 
-		return {
-			setCookie: _setCookie,
-			getCookie: _getCookie,
-			deleteCookie: _deleteCookie,
-			setMetaCookie: _setMetaCookie,
-			getMetaCookie: _getMetaCookie,
-			deleteMetaCookie: _deleteMetaCookie,
-			getDomain: _getDomain
+    // get all existing sub cookies
+    for (x in subCookies) {
+      if (subCookies.hasOwnProperty(x)) {
+        fields = subCookies[x].split(gMinorDelim);
+        if (fields[0] && fields[1]) {
+          temp[fields[0]] = fields[1]; // build hash  
+        }
+      }
+    }
+	  
+    // set or reset sub cookie
+    if (subName) {
+      temp[subName] = value;
+    }
+
+	  // rebuild cookie string
+    for (x in temp) {
+      if (temp.hasOwnProperty(x)) {
+        // don't rebuild null values
+        if (temp[x]) {
+          newCookieVal += gMajorDelim + x + gMinorDelim + temp[x];   
+        }
+      }
+	  }
+    return(setCookie(name, newCookieVal));
+  }
+
+  /**
+   * Deletes a sub cookie within a meta cookie
+   * @method deleteMetaCookie
+   * @private
+   * @param {String} subName The name of the cookie subfield
+   * @param {String} name The name of the cookie
+   * @return {Void}
+   */  
+  function deleteMetaCookie(subName, name) {
+	  // set value to null so its subcookie doesn't get re-added
+	  return(setMetaCookie(subName, name, null));
+  }
+
+  /**
+   * Reports the cookie domain
+   * @method getDomain
+   * @private
+   * @return {String} The domain used for setting cookies
+   */  
+	function getDomain() {
+		return gDomain;
+	}
+
+	return {
+    setCookie: setCookie,
+    getCookie: getCookie,
+    deleteCookie: deleteCookie,
+    setMetaCookie: setMetaCookie,
+    getMetaCookie: getMetaCookie,
+    deleteMetaCookie: deleteMetaCookie,
+    getDomain: getDomain
 	};
-})( ));
+
+}()) );
 
