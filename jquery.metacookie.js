@@ -196,24 +196,13 @@ jQuery.extend(true, ( function () {
 	  return(setMetaCookie(subName, name, null));
   }
 
-  /**
-   * Reports the cookie domain
-   * @method getDomain
-   * @private
-   * @return {String} The domain used for setting cookies
-   */  
-	function getDomain() {
-		return gDomain;
-	}
-
 	return {
     setCookie: setCookie,
     getCookie: getCookie,
     deleteCookie: deleteCookie,
     setMetaCookie: setMetaCookie,
     getMetaCookie: getMetaCookie,
-    deleteMetaCookie: deleteMetaCookie,
-    getDomain: getDomain
+    deleteMetaCookie: deleteMetaCookie
 	};
 
 }()) );
