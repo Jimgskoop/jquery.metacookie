@@ -3,7 +3,7 @@
  *
  * Copyright 2012 James Gourgoutis
  * Released uner the MIT license
- * 
+ * https://raw.github.com/Jimgskoop/jquery.metacookie/master/LICENSE.TXT
  */
 
 jQuery.extend(true, ( function () {
