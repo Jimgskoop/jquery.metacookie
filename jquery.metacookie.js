@@ -1,5 +1,5 @@
 /**
- * jQuery.metacookie library v1.0
+ * jQuery.metacookie plug-in v1.0
  *
  * Copyright 2012 James Gourgoutis
  * Released uner the MIT license
