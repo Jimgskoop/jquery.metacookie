@@ -1,3 +1,11 @@
+/**
+ * jQuery.metacookie library v1.0
+ *
+ * Copyright 2012 James Gourgoutis
+ * Released uner the MIT license
+ * 
+ */
+
 jQuery.extend(true, ( function () {
     
   var gCookieLife = '1 year', // cookies will expire in 1 year by default
