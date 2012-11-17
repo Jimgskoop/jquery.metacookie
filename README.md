@@ -1,3 +1,8 @@
+# What It Does
+
+Jquery.metacookie operates on nested/bundled cookies, generally having the format
+
+cookiename=key:value|key:value|key:value
 
 
 # Public Methods
