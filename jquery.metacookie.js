@@ -200,18 +200,29 @@ jQuery.extend(true, ( function () {
    * @return {Void}
    */  
   function deleteMetaCookie(subName, name) {
-	  // set value to null so its subcookie doesn't get re-added
-	  return(setMetaCookie(subName, name, null));
+     // set value to null so its subcookie doesn't get re-added
+     return(setMetaCookie(subName, name, null));
   }
 
-	return {
+  /**
+   * Setter for a custom cookie domain
+   * @method setDomain
+   * @param  {String}  domain The domain to use for the cookie
+   */
+  function setDomain(domain) {
+    gDomain = domain || gDomain;
+  }
+
+
+  return {
     setCookie: setCookie,
     getCookie: getCookie,
     deleteCookie: deleteCookie,
     setMetaCookie: setMetaCookie,
     getMetaCookie: getMetaCookie,
-    deleteMetaCookie: deleteMetaCookie
-	};
+    deleteMetaCookie: deleteMetaCookie,
+    setCookieDomain: setDomain
+  };
 
 }()) );
 
