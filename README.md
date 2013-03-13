@@ -13,5 +13,5 @@ key=value|key=value|key=value
 * $.setMetaCookie(subName, name, value) - Set a sub cookie within a meta cookie
 * $.getMetaCookie(subName, name) - Retrieve the value for a subcookie in a meta cookie
 * $.deleteMetaCookie(subName, name) - Removes a sub cookie within a meta cookie
-* $.getDomain() - Reports cookie domain
+* $.setDomain() - Sets a custom cookie domain
 
